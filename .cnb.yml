@@ -1,0 +1,60 @@
+$:
+  vscode:
+    - imports:
+        - https://cnb.cool/arsrna/env/-/blob/main/git.yaml
+      runner:
+        cpus: 32
+      docker:
+        image: docker.cnb.cool/arsrna/dev-env/node22
+        volumes:
+          - /root/.pnpm:cow
+          - /root/.pnpm-store:cow
+          - /workspace/.next/cache:cow
+      services:
+        - vscode
+        - docker
+      stages:
+        - name: install
+          script: pnpm i
+
+master:
+  push:
+    sync_to_github:
+      runner:
+        cpus: 8
+      services:
+        - docker
+      stages:
+        - name: sync to github
+          image: tencentcom/git-sync
+          imports:
+            - https://cnb.cool/arsrna/env/-/blob/main/git.yaml
+          settings:
+            target_url: https://github.com/ArSrNa/default-page.git
+            auth_type: https
+            username: ${GIT_USERNAME}
+            password: ${GIT_ACCESS_TOKEN}
+            git_email: "root@arsrna.cn"
+
+    eodeploy:
+      services:
+        - docker
+      docker:
+        image: docker.cnb.cool/arsrna/dev-env/node22
+        volumes:
+          # 使用缓存，同时更新
+          - /root/.pnpm:cow
+          - /root/.pnpm-store:cow
+          - /workspace/.next/cache:cow
+      runner:
+        cpus: 32
+      stages:
+        - name: build
+          script:
+            - pnpm i
+            - npm run build
+        - name: 部署我的 eo pages 正式环境
+          imports:
+            - https://cnb.cool/arsrna/env/-/blob/main/tencent.yml
+          image: tencentcom/deploy-eopages:latest
+          script: edgeone pages deploy ./out -n default-page -t $EO_SECRET
