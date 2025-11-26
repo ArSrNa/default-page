@@ -9,7 +9,6 @@ $:
         volumes:
           - /root/.pnpm:cow
           - /root/.pnpm-store:cow
-          - /workspace/.next/cache:cow
       services:
         - vscode
         - docker
@@ -45,7 +44,6 @@ main:
           # 使用缓存，同时更新
           - /root/.pnpm:cow
           - /root/.pnpm-store:cow
-          - /workspace/.next/cache:cow
       runner:
         cpus: 32
       stages:
