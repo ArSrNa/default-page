@@ -55,4 +55,4 @@ main:
           imports:
             - https://cnb.cool/arsrna/env/-/blob/main/tencent.yml
           image: tencentcom/deploy-eopages:latest
-          script: edgeone pages deploy ./out -n default-page -t $EO_SECRET
+          script: edgeone pages deploy ./dist -n default-page -t $EO_SECRET
